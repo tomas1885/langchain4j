@@ -67,6 +67,11 @@ public class BedrockStreamingChatModel extends AbstractBedrockChatModel implemen
         AtomicReference<ContentBlockDelta.Type> currentContentType = new AtomicReference<>();
 
         ConverseStreamResponseHandler converseStreamResponseHandler = ConverseStreamResponseHandler.builder()
+                .onError(ex->{
+                    RuntimeException mappedError = BedrockExceptionMapper.INSTANCE.mapException(ex);
+                    withLoggingExceptions(() -> handler.onError(mappedError));
+                })
+                .onResponse(response -> {})
                 .subscriber(ConverseStreamResponseHandler.Visitor.builder()
                         .onMessageStart(event -> {
                             if (logResponses) {
